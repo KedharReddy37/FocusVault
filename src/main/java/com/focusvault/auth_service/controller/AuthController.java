@@ -1,6 +1,7 @@
 package com.focusvault.auth_service.controller;
 
 import com.focusvault.auth_service.dto.AuthResponseDto;
+import com.focusvault.auth_service.dto.LoginRequestDto;
 import com.focusvault.auth_service.dto.RegisterRequestDto;
 import com.focusvault.auth_service.service.AuthService;
 import jakarta.validation.Valid;
@@ -24,8 +25,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(
             @Valid @RequestBody RegisterRequestDto request) {
-
         AuthResponseDto response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDto> login(
+            @Valid @RequestBody LoginRequestDto request) {
+        AuthResponseDto response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

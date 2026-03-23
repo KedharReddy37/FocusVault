@@ -42,10 +42,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         // 3. Extract token (remove "Bearer " prefix)
-        final String token = authHeader.substring(7);
+        final String token = authHeader.substring(7).trim();
 
         // 4. Extract email from token
-        final String email = jwtService.extractEmail(token);
+        final String email;
+try {
+    email = jwtService.extractEmail(token);
+} catch (Exception e) {
+    filterChain.doFilter(request, response);
+    return;
+}
 
         // 5. If email found and user not already authenticated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

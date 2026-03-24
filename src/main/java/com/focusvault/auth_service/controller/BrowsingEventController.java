@@ -1,7 +1,9 @@
 package com.focusvault.auth_service.controller;
 
+import com.focusvault.auth_service.dto.BrowsingEventMessage;
 import com.focusvault.auth_service.dto.BrowsingEventRequestDto;
 import com.focusvault.auth_service.dto.BrowsingEventResponseDto;
+import com.focusvault.auth_service.service.BrowsingEventProducer;
 import com.focusvault.auth_service.service.BrowsingEventService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,36 +22,50 @@ import java.util.Map;
 public class BrowsingEventController {
 
     private final BrowsingEventService browsingEventService;
+    private final BrowsingEventProducer browsingEventProducer;
 
-    public BrowsingEventController(BrowsingEventService browsingEventService) {
+    public BrowsingEventController(BrowsingEventService browsingEventService,
+                                    BrowsingEventProducer browsingEventProducer) {
         this.browsingEventService = browsingEventService;
+        this.browsingEventProducer = browsingEventProducer;
     }
 
-    // Save a new browsing event
     @PostMapping
-    public ResponseEntity<BrowsingEventResponseDto> saveEvent(
+    public ResponseEntity<Map<String, String>> saveEvent(
             @Valid @RequestBody BrowsingEventRequestDto request,
             Principal principal) {
 
-        BrowsingEventResponseDto response =
-                browsingEventService.saveEvent(request, principal.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        // Build the Kafka message
+        BrowsingEventMessage message = new BrowsingEventMessage(
+                principal.getName(),
+                request.getDomain(),
+                request.getStartTime(),
+                request.getEndTime(),
+                request.getCategory()
+        );
+
+        // Send to Kafka — returns instantly
+        browsingEventProducer.sendEvent(message);
+
+        // Return immediately — don't wait for DB save
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(Map.of(
+                    "status", "accepted",
+                    "message", "Event received and being processed"
+                ));
     }
 
-    // Get all my events
     @GetMapping
     public ResponseEntity<List<BrowsingEventResponseDto>> getMyEvents(
             Principal principal) {
-
         List<BrowsingEventResponseDto> events =
                 browsingEventService.getMyEvents(principal.getName());
         return ResponseEntity.ok(events);
     }
 
-    // Get summary — time spent per domain
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Long>> getSummary(Principal principal) {
-
         Map<String, Long> summary =
                 browsingEventService.getSummary(principal.getName());
         return ResponseEntity.ok(summary);

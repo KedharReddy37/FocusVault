@@ -6,6 +6,8 @@ import com.focusvault.auth_service.entity.BrowsingEvent;
 import com.focusvault.auth_service.entity.User;
 import com.focusvault.auth_service.repository.BrowsingEventRepository;
 import com.focusvault.auth_service.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ public class BrowsingEventService {
         this.userRepository = userRepository;
     }
 
-    // ── Save a new browsing event ──────────────────
+    @CacheEvict(value = "summary", key = "#email")
     public BrowsingEventResponseDto saveEvent(BrowsingEventRequestDto request, String email) {
 
         User user = userRepository.findByEmail(email)
@@ -44,7 +46,6 @@ public class BrowsingEventService {
         return toResponseDto(event);
     }
 
-    // ── Get all events for logged-in user ──────────
     public List<BrowsingEventResponseDto> getMyEvents(String email) {
 
         User user = userRepository.findByEmail(email)
@@ -57,7 +58,7 @@ public class BrowsingEventService {
                 .collect(Collectors.toList());
     }
 
-    // ── Get summary — time per domain ──────────────
+    @Cacheable(value = "summary", key = "#email")
     public Map<String, Long> getSummary(String email) {
 
         User user = userRepository.findByEmail(email)
@@ -68,14 +69,14 @@ public class BrowsingEventService {
 
         Map<String, Long> summary = new HashMap<>();
         for (BrowsingEvent event : events) {
-            long seconds = Duration.between(event.getStartTime(), event.getEndTime()).getSeconds();
+            long seconds = Duration.between(
+                    event.getStartTime(), event.getEndTime()).getSeconds();
             summary.merge(event.getDomain(), seconds, Long::sum);
         }
 
         return summary;
     }
 
-    // ── Convert entity to response dto ────────────
     private BrowsingEventResponseDto toResponseDto(BrowsingEvent event) {
         long durationSeconds = Duration.between(
                 event.getStartTime(), event.getEndTime()).getSeconds();

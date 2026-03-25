@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 300px;
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e1e2e;
+    }
+
+    .header {
+      background: #1a56db;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .status-badge.active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot.green { background: #10b981; }
+    .dot.red { background: #ef4444; }
+
+    .domain-info {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .domain-info span {
+      font-weight: bold;
+      color: #1a56db;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #1a56db;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      background: #1a56db;
+      color: white;
+    }
+
+    .btn-primary:hover { background: #1e40af; }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      margin-top: 8px;
+    }
+
+    .btn-danger:hover { background: #fecaca; }
+
+    .error {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🎯 FocusVault</h1>
+    <p>Browsing Intelligence</p>
+  </div>
+
+  <div class="content">
+
+    <!-- Logged In View -->
+    <div id="logged-in-view" style="display:none;">
+      <div class="status-badge active">
+        <div class="dot green"></div>
+        Tracking Active
+      </div>
+
+      <div class="domain-info" id="domain-info">
+        Currently on: <span id="current-domain">—</span>
+      </div>
+
+      <button class="btn-danger" id="logout-btn">
+        Stop Tracking & Logout
+      </button>
+    </div>
+
+    <!-- Logged Out View -->
+    <div id="logged-out-view" style="display:none;">
+      <div class="status-badge inactive">
+        <div class="dot red"></div>
+        Not Tracking
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="kedhar@gmail.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" />
+      </div>
+
+      <button class="btn-primary" id="login-btn">
+        Login & Start Tracking
+      </button>
+
+      <div class="error" id="error-msg"></div>
+    </div>
+
+    <!-- Loading View -->
+    <div id="loading-view">
+      <div class="loading">Loading...</div>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

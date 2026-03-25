@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "FocusVault",
+  "version": "1.0",
+  "description": "Track your browsing habits and improve focus",
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "activeTab"
+  ],
+
+  "host_permissions": [
+    "http://localhost:8081/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FocusVault"
+  }
+}
